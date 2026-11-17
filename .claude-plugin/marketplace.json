@@ -1,0 +1,22 @@
+{
+  "name": "alexccastilho-skills",
+  "description": "Skills de Alex Camacho Castilho para Claude Code.",
+  "owner": {
+    "name": "Alex Camacho Castilho",
+    "url": "https://github.com/alexccastilho"
+  },
+  "plugins": [
+    {
+      "name": "humanizer-token-optimizer-pt-br",
+      "source": "./",
+      "description": "Humaniza textos em Português do Brasil: remove marcas de escrita de IA e reescreve com voz natural, sem alterar o conteúdo.",
+      "version": "2.0.0",
+      "category": "productivity",
+      "author": {
+        "name": "Alex Camacho Castilho",
+        "url": "https://github.com/alexccastilho"
+      },
+      "license": "MIT"
+    }
+  ]
+}
