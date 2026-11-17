@@ -1,10 +1,10 @@
 # Análise da skill humanizer-token-optimizer-pt-br
 
 Original analisado: `SKILL.md` de 9.472 bytes, 144 linhas (L = linha do original).
-Versão nova: `skills/humanizer-token-optimizer-pt-br/SKILL.md`, 9.457 bytes, 116 linhas. Os dois arquivos usam quebra de linha LF, então os tamanhos são comparáveis.
+Versão nova: `skills/humanizer-token-optimizer-pt-br/SKILL.md`, 9.531 bytes, 120 linhas (9.457 bytes antes de receber `license` e `metadata` no frontmatter). Os dois arquivos usam quebra de linha LF, então os tamanhos são comparáveis.
 A descrição (sempre carregada no contexto) caiu de 778 para 768 caracteres; o limite é 1.024.
 
-A versão nova não foi testada com execuções reais. As regras de formato foram conferidas na skill `skill-creator` e no validador dela (`quick_validate.py`): descrição de até 1.024 caracteres e sem `<` ou `>`, um único `SKILL.md`, e seis chaves permitidas no frontmatter (`name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`). Por escolha, a skill usa só `name` e `description`.
+As regras de formato foram conferidas na skill `skill-creator` e no validador dela (`quick_validate.py`): descrição de até 1.024 caracteres e sem `<` ou `>`, um único `SKILL.md`, e seis chaves permitidas no frontmatter (`name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`). A skill usa `name`, `description`, `license` (MIT) e `metadata` (autor e versão).
 
 ## Resumo
 
@@ -96,7 +96,7 @@ Correção: opinião e primeira pessoa só quando o original já tem ou com `[OP
 
 ## Não alterado, e por quê
 
-- **`name` e formato do frontmatter.** Só `name` e `description` em bloco dobrado, que já carrega no claude.ai e no Claude Code. Sem campos de autor ou licença, como pedido.
+- **`name` e formato do frontmatter.** `description` em bloco dobrado, que já carrega no claude.ai e no Claude Code. Autor, versão e licença foram acrescentados em `license` e `metadata`, chaves aceitas pelo validador.
 - **Arquivo único, sem `references/`.** Com 116 linhas, quase tudo é usado em toda execução. Um arquivo de referência custaria uma leitura extra por uso e economizaria pouco. O limite sugerido pela `skill-creator` é de 500 linhas.
 - **Convenção de idioma.** Lógica em inglês, exemplos e mensagens ao usuário em pt-BR.
 - **As sete tags, com os mesmos nomes.** Quem já usa a skill não precisa reaprender.
@@ -106,3 +106,15 @@ Correção: opinião e primeira pessoa só quando o original já tem ou com `[OP
 - **Aviso contra supercorreção e contra prometer "indetectável".** Mantidos, pois evitam os dois abusos mais prováveis.
 - **Saudação de e-mail ("Espero que esteja bem").** Não entrou como marca de IA: é convenção humana corrente em e-mail corporativo no Brasil e geraria falso positivo.
 - **Avaliações automatizadas (evals).** Não foram criadas, porque a tarefa pede só os dois arquivos.
+
+## Teste comparativo
+
+Três casos rodados às cegas: cada versão foi aplicada por um agente que não sabia qual era.
+
+| Caso | v1.0.0 | v2.0.0 |
+|---|---|---|
+| Post de LinkedIn com travessões, "não é X, é Y" e "especialistas afirmam" | Limpou bem; manteve a atribuição vaga sem aviso | Limpou bem; manteve a atribuição e acrescentou `Falta fonte:` |
+| Texto técnico com "otimizar a query", intervalo 10-20, citação literal e código | Alterou a citação literal, trocou "otimizar" por "acelerar" e "10-20" por "10 a 20" | Citação, intervalo, código e termo técnico intactos; cortou só o enchimento |
+| E-mail já bem escrito | Devolveu o texto igual | Respondeu em uma linha que não havia o que mudar |
+
+A v2.0.0 passou nos três casos. O teste é pequeno e serve como verificação de regressão, não como avaliação estatística.

@@ -52,10 +52,10 @@ cp -r humanizer-token-optimizer-pt-br/skills/humanizer-token-optimizer-pt-br ~/.
 ### claude.ai
 
 1. Baixe `humanizer-token-optimizer-pt-br.zip` na [última release](https://github.com/alexccastilho/humanizer-token-optimizer-pt-br/releases/latest).
-2. No claude.ai, abra **Settings > Capabilities** e confira se **Code execution and file creation** está ativado.
-3. Vá em **Customize > Skills**, clique em **Upload skill** e envie o ZIP sem descompactar.
+2. Confira se a execução de código está ativada na sua conta (as skills dependem dela).
+3. Em [Customize > Skills](https://claude.ai/customize/skills), envie o ZIP sem descompactar.
 
-Se você já tem uma versão anterior instalada, remova-a antes de enviar a nova. As skills do claude.ai e do Claude Code não sincronizam entre si.
+Se já houver uma versão anterior com o mesmo nome, substitua-a pela nova. As skills do claude.ai e do Claude Code não sincronizam entre si.
 
 Para gerar o ZIP a partir do código: `python scripts/build_zip.py` (saída em `dist/`).
 
