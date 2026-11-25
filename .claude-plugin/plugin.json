@@ -1,7 +1,7 @@
 {
   "name": "humanizer-token-optimizer-pt-br",
   "version": "2.0.0",
-  "description": "Humaniza textos em Português do Brasil: remove marcas de escrita de IA e reescreve com voz natural, sem alterar o conteúdo e com alta eficiência de tokens.",
+  "description": "Humaniza textos em Português do Brasil: remove marcas de escrita de IA e reescreve com voz natural, sem alterar o conteúdo.",
   "author": {
     "name": "Alex Camacho Castilho",
     "url": "https://github.com/alexccastilho"

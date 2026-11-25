@@ -9,7 +9,7 @@ Criada e mantida por **Alex Camacho Castilho**.
 - **Preserva o conteúdo.** Não inventa fato, número, fonte nem exemplo, e não muda a força das afirmações. Quando o texto se apoia em "especialistas afirmam" sem fonte, ela avisa em vez de inventar uma.
 - **Protege o que não deve ser tocado.** Citações diretas, código, URLs, e-mails, @menções, #hashtags, nomes e marcas (P&D, Johnson & Johnson), números, datas, intervalos (10-20) e termos técnicos ou jurídicos são copiados sem alteração.
 - **Corta marcas de IA com critério.** O vocabulário é tratado como lista de suspeitos, não como lista proibida: "otimizar a query" e "ecossistema" em biologia continuam onde estão.
-- **Economiza tokens.** Entrega só o texto reescrito, sem preâmbulo nem lista de mudanças, e o texto final costuma sair mais curto que o original.
+- **Entrega só o texto.** Sem preâmbulo, sem "se quiser, posso ajustar" e sem lista de mudanças. O texto final costuma sair mais curto que o original.
 - **Ajusta ao canal.** LinkedIn, Instagram, X, e-mail corporativo, blog, WhatsApp e press release.
 
 ## Exemplo
@@ -77,7 +77,7 @@ Humaniza esse post pro LinkedIn: <texto>
 | `[CANAL: LinkedIn]` | Adapta ao canal indicado |
 | `[DEBUG]` | Lista os padrões de IA encontrados antes do texto |
 | `[ESTRUTURA]` | Mantém a estrutura original, sem converter listas em prosa |
-| `[TRAVESSAO: OK]` | Mantém os travessões do original |
+| `[TRAVESSAO: OK]` | Mantém os travessões que já estavam no original, sem criar nenhum novo |
 
 As tags podem ser combinadas. Um pedido em linguagem comum vale como a tag correspondente ("deixa mais informal" equivale a `[CASUAL]`).
 

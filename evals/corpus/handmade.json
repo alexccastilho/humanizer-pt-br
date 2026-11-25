@@ -1,0 +1,135 @@
+[
+  {
+    "id": "adv-tecnico", "split": "dev", "channel": "tecnico", "origin": "adversarial",
+    "request": "Humaniza esse trecho da documentação:",
+    "text": "Vale ressaltar que, para otimizar a query, é crucial criar um índice na coluna `cliente_id` — algo que reduz o tempo de resposta de 800 ms para algo entre 10-20 ms. Como disse o DBA na revisão: \"não mexam no pool de conexões sem medir antes\". Em resumo, rode `EXPLAIN ANALYZE` antes de qualquer mudança.",
+    "protected": ["otimizar a query", "`cliente_id`", "10-20", "\"não mexam no pool de conexões sem medir antes\"", "`EXPLAIN ANALYZE`"],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-falta-fonte", "split": "holdout", "channel": "linkedin", "origin": "adversarial",
+    "request": "Humaniza esse post pro LinkedIn:",
+    "text": "No mundo atual, a inteligência artificial não é apenas uma tendência — é uma revolução. Especialistas afirmam que 70% das empresas brasileiras vão adotar IA generativa até 2027. Vale ressaltar: quem não se adaptar vai ficar para trás. E você, já está preparado?",
+    "protected": ["70%", "2027"],
+    "tags": [], "expect": {"falta_fonte": true}
+  },
+  {
+    "id": "adv-falta-fonte-2", "split": "dev", "channel": "blog", "origin": "adversarial",
+    "request": "Humaniza esse parágrafo do blog:",
+    "text": "Estudos mostram que dormir menos de 6 horas por noite pode aumentar em até 30% o risco de doenças cardíacas. Trata-se, sem dúvida, de um dado alarmante — e que merece a nossa atenção.",
+    "protected": ["6 horas", "pode aumentar em até 30%"],
+    "tags": [], "expect": {"falta_fonte": true}
+  },
+  {
+    "id": "adv-tag-travessao", "split": "holdout", "channel": "blog", "origin": "adversarial",
+    "request": "[TRAVESSAO: OK] Humaniza esse texto, mas mantém os travessões que eu coloquei:",
+    "text": "A reforma da praça — prometida desde 2019 — finalmente começou. É importante notar que a obra, extremamente aguardada pelos moradores, vai custar R$ 1,2 milhão e deve durar 8 meses. Sem dúvida, trata-se de um marco fundamental para o bairro.",
+    "protected": ["2019", "R$ 1,2 milhão", "8 meses"],
+    "tags": ["[TRAVESSAO: OK]"], "expect": {"keep_dashes": true}
+  },
+  {
+    "id": "adv-ficcao", "split": "dev", "channel": "ficcao", "origin": "adversarial",
+    "request": "Humaniza esse trecho do meu conto:",
+    "text": "A chuva caía sobre a cidade — implacável, interminável, quase poética.\n— Você vem comigo? — perguntou Helena.\n— Não posso — respondeu ele, sem levantar os olhos.\nNaquele momento, ela compreendeu que tudo havia mudado para sempre — e que nada seria como antes.",
+    "protected": ["— Você vem comigo? — perguntou Helena.", "— Não posso — respondeu ele, sem levantar os olhos."],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-pt-pt", "split": "holdout", "channel": "email", "origin": "adversarial",
+    "request": "Humaniza este e-mail:",
+    "text": "Caro Rui,\n\nVenho por este meio informar que a reunião de amanhã foi adiada para as 15h. Será fundamental que tragas o portátil, uma vez que vamos rever a apresentação no ecrã grande. Em última análise, o objetivo é fechar a proposta até sexta-feira.\n\nCumprimentos,\nTeresa",
+    "protected": ["15h", "Rui", "Teresa"],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-instagram", "split": "dev", "channel": "instagram", "origin": "adversarial",
+    "request": "Tira o jeito de IA dessa legenda:",
+    "text": "✨ Não é só um café — é uma experiência! ✨ Venha descobrir o nosso novo blend artesanal, cuidadosamente selecionado para você. Robusto, aromático e inesquecível. 📍 Rua das Flores, 120 👉 Reservas: www.cafebrisa.example.com.br Marque quem você levaria! @cafebrisa #cafeespecial #curitiba",
+    "protected": ["Rua das Flores, 120", "www.cafebrisa.example.com.br", "@cafebrisa", "#cafeespecial", "#curitiba"],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-marcas", "split": "holdout", "channel": "email", "origin": "adversarial",
+    "request": "Deixa esse e-mail mais natural:",
+    "text": "Prezados,\n\nGostaria de destacar que a área de P&D concluiu — com sucesso — os testes do novo curativo em parceria com a Johnson & Johnson. Vale ressaltar que os resultados & a documentação estão disponíveis na pasta compartilhada. Ficamos à disposição para eventuais dúvidas.\n\nAtenciosamente,\nMarcos Teixeira",
+    "protected": ["P&D", "Johnson & Johnson", "Marcos Teixeira"],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-passo-a-passo", "split": "dev", "channel": "tecnico", "origin": "adversarial",
+    "request": "Humaniza esse tutorial, mas é um passo a passo:",
+    "text": "Configurar o seu roteador nunca foi tão fácil! Siga estes passos simples e robustos:\n\n1. **Acesso:** abra o navegador e digite `192.168.0.1`.\n2. **Login:** use o usuário `admin` e a senha que está na etiqueta.\n3. **Rede:** vá em Wi-Fi e troque o nome da rede.\n4. **Finalização:** clique em Salvar e aguarde cerca de 2 minutos.\n\nPronto! Agora você está preparado para navegar com tranquilidade.",
+    "protected": ["`192.168.0.1`", "`admin`", "cerca de 2 minutos"],
+    "tags": ["[ESTRUTURA]"], "expect": {}
+  },
+  {
+    "id": "adv-casual", "split": "holdout", "channel": "whatsapp", "origin": "adversarial",
+    "request": "[CASUAL] Deixa essa mensagem pro grupo da família mais leve:",
+    "text": "Prezados familiares, informo que o almoço de domingo será realizado na residência da vovó Neide, a partir das 12h30. Solicito que cada núcleo familiar providencie uma sobremesa. Ressalto que a presença de todos é fundamental.",
+    "protected": ["vovó Neide", "12h30"],
+    "tags": ["[CASUAL]"], "expect": {}
+  },
+  {
+    "id": "adv-formal", "split": "dev", "channel": "email", "origin": "adversarial",
+    "request": "[FORMAL] Ajeita esse texto pra mandar pro cliente:",
+    "text": "Oi, tudo bem? Então, a gente deu uma olhada no contrato e tá tudo certo, só falta vocês assinarem a página 4 e mandar de volta até dia 20. Qualquer coisa me chama!",
+    "protected": ["página 4", "20"],
+    "tags": ["[FORMAL]"], "expect": {}
+  },
+  {
+    "id": "adv-contraste-legitimo", "split": "holdout", "channel": "blog", "origin": "adversarial",
+    "request": "Humaniza esse parágrafo:",
+    "text": "Não é verdade que a vacina tríplice viral causa autismo. O estudo de 1998 que sugeria essa ligação foi retratado pela revista The Lancet em 2010, e o autor perdeu o registro médico. Vale ressaltar que pesquisas com mais de 650 mil crianças não encontraram nenhuma relação.",
+    "protected": ["1998", "The Lancet", "2010", "650 mil"],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-triade-real", "split": "dev", "channel": "press", "origin": "adversarial",
+    "request": "Humaniza esse release:",
+    "text": "A rede Mar Azul — referência em hotelaria no Nordeste — anuncia a abertura de três novos hotéis: em Recife, Natal e João Pessoa. Os empreendimentos, verdadeiramente inovadores, somam 420 quartos e devem gerar cerca de 600 empregos diretos.\n\nAna Lúcia Freire - Diretora de Expansão",
+    "protected": ["Recife", "Natal", "João Pessoa", "420 quartos", "cerca de 600", "Ana Lúcia Freire - Diretora de Expansão"],
+    "tags": [], "expect": {}
+  },
+  {
+    "id": "adv-diagnostico", "split": "holdout", "channel": "linkedin", "origin": "adversarial",
+    "request": "O que tem de IA nesse texto? Não reescreve, só me aponta:",
+    "text": "Mais do que um trabalho, a liderança é uma jornada. Ao longo dos meus 12 anos de carreira, aprendi que o segredo — sim, o verdadeiro segredo — está nas pessoas. O resultado? Equipes engajadas, resilientes e de alta performance.",
+    "protected": [],
+    "tags": [], "expect": {"mode": "diagnosis"}
+  },
+  {
+    "id": "clean-email", "split": "dev", "channel": "email", "origin": "clean",
+    "request": "Humaniza esse e-mail:",
+    "text": "Oi, Carla,\n\nMandei ontem a planilha com os custos de outubro. O total ficou em R$ 18.400, um pouco acima do previsto por causa do conserto da empilhadeira.\n\nConsegue revisar até quinta? Se precisar de algum comprovante, me avisa.\n\nAbraço,\nDiego",
+    "protected": ["R$ 18.400", "Carla", "Diego"],
+    "tags": [], "expect": {"unchanged": true}
+  },
+  {
+    "id": "clean-linkedin", "split": "holdout", "channel": "linkedin", "origin": "clean",
+    "request": "Humaniza esse post pro LinkedIn:",
+    "text": "Hoje faz um ano que saí do banco para abrir a minha consultoria. Não foi fácil: nos primeiros quatro meses tive só dois clientes, e pensei em desistir mais de uma vez.\n\nO que mudou foi parar de tentar atender todo mundo. Hoje trabalho só com pequenas indústrias do interior de São Paulo, e isso trouxe mais indicação do que qualquer anúncio.\n\nSe você está pensando em fazer o mesmo, junte uma reserva antes. Eu juntei seis meses e usei quase tudo.",
+    "protected": ["um ano", "quatro meses", "dois clientes", "seis meses"],
+    "tags": [], "expect": {"unchanged": true}
+  },
+  {
+    "id": "clean-whatsapp", "split": "dev", "channel": "whatsapp", "origin": "clean",
+    "request": "Deixa essa mensagem mais natural:",
+    "text": "Pessoal, a reunião de amanhã passou para as 10h, na sala 3. Quem não puder ir me avisa que eu mando o resumo depois.",
+    "protected": ["10h", "sala 3"],
+    "tags": [], "expect": {"unchanged": true}
+  },
+  {
+    "id": "clean-blog", "split": "holdout", "channel": "blog", "origin": "clean",
+    "request": "Humaniza esse texto do blog:",
+    "text": "Comecei a fazer pão em casa durante a pandemia, como muita gente. Os primeiros saíram duros feito tijolo. Demorei para entender que o problema não era a receita, era a pressa: a massa precisa de tempo, e eu cortava a fermentação pela metade.\n\nHoje deixo a massa crescer a noite toda na geladeira. Dá menos trabalho e o pão fica com mais sabor. Se você está começando, esqueça o relógio e olhe para a massa: quando ela dobrar de tamanho, está pronta.",
+    "protected": [],
+    "tags": [], "expect": {"unchanged": true}
+  },
+  {
+    "id": "clean-press", "split": "holdout", "channel": "press", "origin": "clean",
+    "request": "Humaniza esse release:",
+    "text": "A Biblioteca Municipal de Itajubá reabre na segunda-feira, 3 de fevereiro, depois de seis meses de reforma. O prédio ganhou elevador, banheiros acessíveis e uma sala de estudos com 40 lugares.\n\nA obra custou R$ 940 mil, pagos com recursos do município e de uma emenda estadual. O horário de funcionamento passa a ser das 8h às 20h, de segunda a sábado.",
+    "protected": ["3 de fevereiro", "seis meses", "40 lugares", "R$ 940 mil", "das 8h às 20h"],
+    "tags": [], "expect": {"unchanged": true}
+  }
+]

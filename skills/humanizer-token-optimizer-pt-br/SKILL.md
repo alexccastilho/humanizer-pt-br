@@ -117,4 +117,4 @@ Tags combine, and a plain request counts as its tag ("deixa mais informal" = `[C
 - `[CANAL: LinkedIn]` adapta ao canal indicado
 - `[DEBUG]` antes do texto, lista até 10 linhas `padrão: trecho`
 - `[ESTRUTURA]` mantém a estrutura original, sem converter listas em prosa
-- `[TRAVESSAO: OK]` mantém os travessões do original
+- `[TRAVESSAO: OK]` mantém os travessões do original; nunca cria travessão novo

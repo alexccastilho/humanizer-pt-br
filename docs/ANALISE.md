@@ -81,7 +81,7 @@ Acrescentadas, com custo baixo: aberturas "Neste artigo, vamos", "Imagine", "Sej
 Correção: a tag passa a acrescentar reação ou avaliação sobre fatos já presentes.
 
 **M7. `[TRAVESSAO: OK]` falava em "restaurar" pontuação editorial (L57).**
-Correção: mantém os travessões do original e não acrescenta novos. Dúvida em aberto: se a intenção era permitir que a skill também crie travessões editoriais, a linha da tag precisa voltar a dizer isso.
+Correção: mantém os travessões do original e não acrescenta novos. Decisão do autor (25/11/2026): a skill nunca cria travessão no meio de frase, nem com a tag. A tag só preserva os que o usuário já escreveu.
 
 **M8. Opinião por padrão em blog e LinkedIn (L96) e "varie o ritmo" como instrução solta (L95).**
 Acrescentar opinião que não está no original é acrescentar conteúdo, o que a fidelidade proíbe. A instrução de ritmo solta incentivava frases picotadas.
