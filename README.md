@@ -85,7 +85,7 @@ As tags podem ser combinadas. Um pedido em linguagem comum vale como a tag corre
 
 ## Resultado medido
 
-Benchmark da v3.0.0 no conjunto de reserva: 67 textos (gerados por Claude Haiku, Sonnet e Opus, mais casos difíceis feitos à mão), 2 rodadas, Claude Sonnet como modelo testado e Claude Opus como juiz cego. Detalhes em [`evals/`](evals/README.md) e números completos em [`evals/results/3.0.0/holdout.md`](evals/results/3.0.0/holdout.md).
+Benchmark da v3.0.0 no conjunto de reserva: 68 casos (textos gerados por Claude Haiku, Sonnet e Opus, mais casos difíceis feitos à mão), 2 rodadas, Claude Sonnet como modelo testado e Claude Opus como juiz cego. Detalhes em [`evals/`](evals/README.md) e números completos em [`evals/results/3.0.0/holdout.md`](evals/results/3.0.0/holdout.md).
 
 | | Sem skill | Prompt de 2 linhas | Skill v3.0.0 |
 |---|---|---|---|

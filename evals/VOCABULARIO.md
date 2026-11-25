@@ -1,6 +1,8 @@
-# Manutenção da lista de vocabulário
+# Vocabulário: como acompanhar os vícios dos modelos
 
-A lista de palavras suspeitas da §4 do `SKILL.md` envelhece: cada geração de modelo troca alguns vícios por outros. Este processo mantém a lista atualizada sem transformá-la em lista proibida e sem buscar nada na internet durante o uso da skill. Uma lista baixada em tempo de execução seria uma porta para instruções injetadas, deixaria a skill mais lenta e nem sempre funcionaria no claude.ai.
+Até a v2.0 a skill carregava uma lista de palavras suspeitas. Na v3.0.0 a lista saiu da skill: no conjunto de reserva, a versão sem lista empatou com a versão com lista, deixou o mesmo número de vícios nas saídas (30 contra 31) e ficou 13% menor. A skill agora depende de regras (enchimento, fórmulas, aberturas e fechamentos prontos), que não envelhecem como uma lista.
+
+A lista antiga continua em `suspeitos.md`, como régua de medição. Este processo serve para saber se os modelos novos trouxeram vícios que as regras não pegam. A skill nunca busca nada na internet durante o uso. Uma lista baixada em tempo de execução seria uma porta para instruções injetadas, deixaria a skill mais lenta e nem sempre funcionaria no claude.ai.
 
 ## Quando revisar
 
@@ -14,15 +16,12 @@ A lista de palavras suspeitas da §4 do `SKILL.md` envelhece: cada geração de 
    `python evals/run.py --out ../humanizer-bench --split dev --arms baseline`
 3. Gere o relatório:
    `python evals/tools/vocab_report.py --bench ../humanizer-bench`
-   Ele lê os suspeitos direto do `SKILL.md` e mostra a frequência por 10 mil palavras em três fontes: texto natural de cada modelo, texto no estilo carregado de chatbot e saída do baseline. Também lista as expressões frequentes em texto de modelo que ainda não estão na lista.
-4. Decida à mão, item por item:
-   - **Entra** uma expressão que aparece na saída do baseline ou no texto natural de modelo e é rara em texto humano (`corpus/human/`). Só a frequência no estilo carregado de chatbot não basta, porque esse estilo foi pedido de propósito.
-   - **Sai** um suspeito que nenhum modelo usou nas duas últimas revisões.
-   - Nada vira proibição. A regra continua: palavra que é afirmação do original fica, em forma mais simples ou como está.
-5. Rode o benchmark completo (`README.md`) antes de publicar a versão com a lista nova.
+   Ele lê os suspeitos de `suspeitos.md` e mostra a frequência por 10 mil palavras em três fontes: texto natural de cada modelo, texto no estilo carregado de chatbot e saída do baseline. Também lista as expressões frequentes em texto de modelo que ainda não estão na lista.
+4. Conte quantos suspeitos sobram nas saídas de cada braço do benchmark. Se a skill deixar com frequência algum vício que as regras atuais não pegam, há dois caminhos: escrever uma regra nova na §4 (preferível, porque não envelhece) ou acrescentar exemplos. Atualize `suspeitos.md` com as expressões novas e tire as que nenhum modelo usou nas duas últimas revisões.
+5. Qualquer mudança na skill passa pelo benchmark completo (`README.md`) antes de publicar.
 
 ## O que a revisão de 25/11/2026 mostrou
 
 - No texto natural de Claude Haiku, Sonnet e Opus 5.5, nenhum dos 56 suspeitos apareceu. Os vícios estão no texto carregado que as pessoas colam, vindo de outros modelos ou de versões antigas.
 - Depois de um pedido simples para humanizar sem a skill, o Claude ainda deixou "inovador", "robusto", "vale ressaltar", "crucial" e "dinâmico".
-- A ablação mostrou que a lista longa fazia a skill apagar adjetivos que eram afirmação do original. A v2.1 encurtou a lista e separou enchimento (apagar) de palavra inflada (manter a afirmação em forma mais simples).
+- No conjunto de desenvolvimento, a versão sem lista pareceu melhor que a com lista (28 a 11), mas no conjunto de reserva as duas empataram (47% x 53%). Uma tentativa intermediária, com lista curta e regra para manter adjetivos que são afirmação, empatou com a v2.0 e foi descartada.

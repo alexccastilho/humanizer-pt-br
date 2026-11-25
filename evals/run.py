@@ -100,7 +100,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--split", default="dev", choices=["dev", "holdout", "all"])
-    ap.add_argument("--arms", default="baseline,minimal,skill,novocab")
+    ap.add_argument("--arms", default="baseline,minimal,skill")
     ap.add_argument("--reps", type=int, default=1)
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--jobs", type=int, default=4)

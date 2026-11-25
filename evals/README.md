@@ -17,7 +17,8 @@ Cada caso pertence a `dev` (usado para ajustar a skill) ou `holdout` (reserva, u
 | `baseline` | Só o pedido do usuário, sem skill |
 | `minimal` | O pedido e uma instrução de duas linhas que qualquer pessoa poderia escrever |
 | `skill` | O pedido, com a skill carregada como plugin (precisa ser acionada sozinha) |
-| `novocab` | Como `skill`, sem a lista de vocabulário da §4 (ablação) |
+| `novocab` | Como `skill`, sem a lista de vocabulário da §4 (ablação; só funciona com uma versão que ainda tenha a lista, como a v2.0) |
+| `cand` | Uma versão candidata da skill (`--cand-dir`), para comparar com a publicada (`--skill-dir`) |
 
 Todas as execuções são isoladas: pasta vazia, sem configurações nem plugins do usuário, sem servidores MCP e sem sincronização de skills do claude.ai (`claude_cli.py`). O modelo testado é fixado por alias (`--model`), e o id real fica gravado em cada resultado.
 
@@ -33,6 +34,7 @@ A contagem de palavras "suspeitas" não entra na decisão: ela usa a lista da pr
 
 | Id | Critério | Se falhar |
 |---|---|---|
+| G0 | Pelo menos 30 reescritas por braço e por par julgado | Nenhum outro critério pode passar |
 | G1 | Nenhum trecho protegido alterado pela skill | Bloqueia a release |
 | G2 | Falhas de número da skill não passam as do baseline | Bloqueia a release |
 | G3 | Erros de fidelidade apontados pelo juiz: skill não passa o baseline | Bloqueia a release |
@@ -45,12 +47,16 @@ Se G4 falhar e o baseline vencer com significância, a skill é reposicionada ou
 ## Como rodar
 
 ```bash
-# 1. execuções (fora do repositório)
-python evals/run.py --out ../humanizer-bench --split holdout --reps 2 --jobs 6
+# 1. execuções (fora do repositório): versão publicada x candidata
+python evals/run.py --out ../humanizer-bench --split holdout --reps 2 --jobs 6 \
+    --arms baseline,minimal,skill,cand --skill-dir <pasta da versão publicada>
 # 2. juiz
-python evals/judge.py --out ../humanizer-bench --split holdout --reps 2 --jobs 6
-# 3. relatório e critérios
-python evals/analyze.py --out ../humanizer-bench --split holdout --report evals/results/<versão>
+python evals/judge.py --out ../humanizer-bench --split holdout --reps 2 --jobs 6 \
+    --pairs cand:baseline,cand:minimal,cand:skill
+# 3. relatório e critérios, aplicados à candidata
+python evals/analyze.py --out ../humanizer-bench --split holdout --candidate cand --report evals/results/<versão>
+# acionamento da descrição
+python evals/trigger.py --out ../humanizer-bench --label <versão>
 ```
 
 O CI não chama modelo nenhum (não há chave de API no repositório). Ele roda `check.py`, os testes e a validação do pacote. O benchmark roda localmente antes de cada release, e o resultado fica em `results/<versão>/`.

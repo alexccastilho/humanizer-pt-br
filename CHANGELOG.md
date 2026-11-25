@@ -8,7 +8,7 @@ Primeira versão medida contra o Claude sem skill. Os números estão em [evals/
 
 ### Alterado
 - **Nome.** `humanizer-token-optimizer-pt-br` passa a ser `humanizer-pt-br` (skill, plugin e repositório), e o marketplace passa a ser `alexccastilho-humanizer`. O benchmark mostrou que a skill custa cerca de 60% mais por pedido do que o Claude sem skill, então o nome não podia prometer economia de tokens. Mudança incompatível: veja "Atualizando da v2" no README.
-- **Vocabulário.** A lista de palavras suspeitas saiu da skill. No conjunto de reserva, a versão sem a lista empatou com a versão com lista (47% x 53%, diferença dentro da margem), com arquivo 13% menor e sem uma lista fixa para envelhecer. A lista antiga ficou em `evals/suspeitos.md`, só para medição.
+- **Vocabulário.** A lista de palavras suspeitas saiu da skill. No conjunto de reserva, a versão sem a lista empatou com a versão com lista (47% x 53%, diferença dentro da margem), deixou o mesmo número de vícios nas saídas (30 contra 31, em 136 respostas), com arquivo 13% menor e sem uma lista fixa para envelhecer. A lista antiga ficou em `evals/suspeitos.md`, só para medição.
 - **Gatilho.** A descrição passa a citar "deixar mais formal ou mais informal".
 - **Travessão.** `[TRAVESSAO: OK]` mantém os travessões que já estavam no original e nunca cria travessão novo.
 
@@ -18,7 +18,7 @@ Primeira versão medida contra o Claude sem skill. Os números estão em [evals/
 - `.gitattributes` com fim de linha LF; o ZIP sai igual no Windows e no Linux.
 
 ### Corrigido
-- O marketplace usava o nome `alexccastilho-skills`, o mesmo de outro plugin do autor, e um podia sobrescrever o outro.
+- O marketplace usava o nome `alexccastilho-skills`, o mesmo já registrado para outro plugin do autor. Dois marketplaces com o mesmo nome podem conflitar na instalação (comportamento não testado); o nome novo evita o risco.
 
 ## [2.0.0] - 2026-11-16
 
