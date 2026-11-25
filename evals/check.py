@@ -111,11 +111,13 @@ def _prose_lines(text, case=None):
     return lines
 
 
-def aside_dashes(text, case=None):
+def aside_dashes(text, case=None, spans=None):
     """Dashes used as aside, pause or emphasis in prose. Ranges (10-20, 2020–2024),
-    compounds (segunda-feira) and protected spans do not count."""
+    compounds (segunda-feira) and protected spans do not count. Pass the spans of the
+    source when checking an output, so text the output itself puts in quotes is not
+    exempted."""
     hits = []
-    spans = protected_spans(text, case)
+    spans = protected_spans(text, case) if spans is None else spans
     for line in _prose_lines(text, case):
         clean = line
         for s in spans:
@@ -160,13 +162,16 @@ def check(source, output, case=None):
     case = case or {}
     tags = case.get("tags", [])
     expect = case.get("expect", {})
-    body = output.split("Falta fonte:")[0]
+    # "Falta fonte:" counts only as trailing lines after the text, not anywhere inside it.
+    m = re.search(r"(?:\n\s*Falta fonte:[^\n]*)+\s*$", output)
+    body = output[:m.start()] if m else output
     missing, added = number_diff(source, body)
     miss_prot = missing_protected(source, output, case)
-    src_d, out_d = aside_dashes(source, case), aside_dashes(body, case)
-    pre = preamble(body if "Falta fonte:" in output else output)
+    src_spans = protected_spans(source, case)
+    src_d, out_d = aside_dashes(source, case, src_spans), aside_dashes(body, case, src_spans)
+    pre = preamble(body)
     punct = punctuation(body)
-    has_ff = "Falta fonte:" in output
+    has_ff = bool(m)
     r = {
         "protected_missing": miss_prot,
         "numbers_missing": missing,

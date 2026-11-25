@@ -5,8 +5,8 @@ description: >
   (travessões, clichês, fórmulas, enchimento) e reescreve com voz natural, sem
   alterar o conteúdo. Use sempre que o usuário pedir para humanizar, tirar o
   jeito de IA, soar mais natural, fluido ou menos robótico, remover "AI slop", tirar
-  travessão, ou adaptar um texto em pt-BR para LinkedIn, Instagram, e-mail, blog
-  ou WhatsApp. Acione também diante de queixas como "parece ChatGPT", "tá muito
+  travessão, deixar mais formal ou mais informal, ou adaptar um texto em pt-BR
+  para LinkedIn, Instagram, e-mail, blog ou WhatsApp. Acione também diante de queixas como "parece ChatGPT", "tá muito
   formal", "não tá com a minha cara" ou "vão perceber que é IA", mesmo sem a
   palavra "humanizar", e em pedidos para reescrever ou melhorar a redação de
   prosa em pt-BR. Não use para código, tradução, correção só ortográfica ou
@@ -58,13 +58,6 @@ Keep dashes in fiction dialogue lines, protected spans, compound words (segunda-
 - At most one "!" per block. No "!!" or "?!".
 
 ## 4. AI tells
-
-**Vocabulary.** Suspects, not a blacklist. Replace a word when it inflates or decorates and a plainer one says the same. Keep it when it is literal or technical ("otimizar a query", "ecossistema" em biologia, "cenário de teste").
-- Verbs: mergulhar, desvendar, abraçar (ideias), alavancar, fomentar, potencializar, impulsionar, catalisar, destravar, navegar (desafios), "vamos explorar"; otimizar, aprimorar, maximizar with no concrete object
-- Adjectives: robusto, crucial, fundamental, essencial, abrangente, vibrante, dinâmico, inovador, revolucionário, impactante, estratégico, holístico, disruptivo, transformador, poderoso, "um verdadeiro X"
-- Metaphor nouns: tapeçaria, sinfonia, testamento, ecossistema, jornada, universo, cenário/panorama, pilar, alicerce, sinergia, mindset, divisor de águas, chave para o sucesso
-- Filler and intensifiers, delete: vale ressaltar/destacar, é importante notar, cabe destacar, é fundamental que, em última análise, nesse contexto, nesse sentido, diante disso, sem dúvida, trata-se de, quando se trata de, realmente, verdadeiramente, extremamente
-- Connectors (além disso, no entanto, portanto, por outro lado, dessa forma, por fim) are legitimate. Fix them only when they open sentence after sentence or link nothing.
 
 **Structure.**
 - Contrast formula ("Não é apenas X, é Y", "Não se trata de X, mas de Y", "Mais do que X, é Y"): state Y. Keep it when X is a real misconception the text refutes.

@@ -106,21 +106,30 @@ def pair_stats(judgments):
     return res, fidelity, naturalness
 
 
-def gates(arms, pairs, fidelity):
+MIN_RUNS = 30  # below this, no gate can pass
+
+
+def gates(arms, pairs, fidelity, candidate="skill"):
+    """Every gate fails closed: missing arm, missing pair or too little data is a FAIL."""
     g = {}
-    s = arms.get("skill", {})
+    s = arms.get(candidate, {})
     b = arms.get("baseline", {})
-    g["G1 trechos protegidos intactos (skill)"] = s.get("failures", {}).get("protected", 1) == 0
-    nb = b.get("failures", {})
-    ns = s.get("failures", {})
-    g["G2 números: skill não pior que baseline"] = (ns.get("numbers_missing", 0) + ns.get("numbers_added", 0)) <= (nb.get("numbers_missing", 0) + nb.get("numbers_added", 0))
-    g["G3 fidelidade (juiz): skill não pior que baseline"] = fidelity.get("skill", {}).get("mean_errors", 9) <= fidelity.get("baseline", {}).get("mean_errors", 0)
-    sb = pairs.get("skill_vs_baseline")
-    g["G4 preferência skill x baseline >= 60% e IC acima de 50%"] = bool(sb and sb["win_rate_x"] >= 0.60 and sb["ci95"][0] > 0.50)
-    sm = pairs.get("skill_vs_minimal")
-    g["G5 skill não perde do prompt mínimo (IC superior >= 50%)"] = bool(sm and sm["ci95"][1] >= 0.50)
-    tok = s.get("cost_usd_mean") is not None and b.get("cost_usd_mean") is not None and s["cost_usd_mean"] <= b["cost_usd_mean"]
-    g["T economia de tokens real (custo médio skill <= baseline)"] = tok
+    enough = s.get("rewrites", 0) >= MIN_RUNS and b.get("rewrites", 0) >= MIN_RUNS
+    g[f"G0 dados suficientes (>= {MIN_RUNS} reescritas por braço)"] = enough
+    if not enough:
+        return g
+    c = candidate
+    g[f"G1 trechos protegidos intactos ({c})"] = s["failures"]["protected"] == 0
+    nb, ns = b["failures"], s["failures"]
+    g[f"G2 números: {c} não pior que baseline"] = (ns["numbers_missing"] + ns["numbers_added"]) <= (nb["numbers_missing"] + nb["numbers_added"])
+    fs, fb = fidelity.get(c), fidelity.get("baseline")
+    g[f"G3 fidelidade (juiz): {c} não pior que baseline"] = bool(fs and fb and fs["n"] >= MIN_RUNS and fs["mean_errors"] <= fb["mean_errors"])
+    sb = pairs.get(f"{c}_vs_baseline")
+    g[f"G4 preferência {c} x baseline >= 60% e IC acima de 50%"] = bool(sb and sb["n"] >= MIN_RUNS and sb["win_rate_x"] >= 0.60 and sb["ci95"][0] > 0.50)
+    sm = pairs.get(f"{c}_vs_minimal")
+    g[f"G5 {c} não perde do prompt mínimo (IC superior >= 50%)"] = bool(sm and sm["n"] >= MIN_RUNS and sm["ci95"][1] >= 0.50)
+    cs, cb = s.get("cost_usd_mean"), b.get("cost_usd_mean")
+    g[f"T economia de tokens real (custo médio {c} <= baseline)"] = cs is not None and cb is not None and cs <= cb
     return g
 
 

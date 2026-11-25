@@ -89,6 +89,20 @@ class FaltaFonte(unittest.TestCase):
         out = src + "\n\nFalta fonte: Especialistas afirmam"
         self.assertNotIn("falta_fonte_missing", check.check(src, out, case)["failures"])
 
+    def test_marker_inside_text_does_not_hide_the_rest(self):
+        src = "O time recusou o plano."
+        out = "Falta fonte: nada. Aqui está o texto — reescrito — sem mudar."
+        r = check.check(src, out)
+        self.assertFalse(r["falta_fonte"])
+        self.assertIn("dashes", r["failures"])
+
+
+class Evasion(unittest.TestCase):
+    def test_quotes_added_by_output_do_not_exempt_dashes(self):
+        src = "O time recusou o plano."
+        out = 'O time "recusou — sem pensar — o plano".'
+        self.assertIn("dashes", check.check(src, out)["failures"])
+
 
 class Clean(unittest.TestCase):
     def test_good_rewrite_has_no_failures(self):
