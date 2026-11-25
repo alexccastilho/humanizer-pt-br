@@ -13,7 +13,7 @@ the repository, so a run cannot read the corpus, the judge prompts or the result
 Usage:
   python evals/run.py --out <folder outside the repo> --split dev|holdout|all
       [--arms baseline,minimal,skill,novocab] [--reps 1] [--model sonnet] [--jobs 4]
-      [--skill-dir <released skill folder>] [--cand-dir skills/humanizer-token-optimizer-pt-br]
+      [--skill-dir <released skill folder>] [--cand-dir skills/humanizer-pt-br]
 
 Results: <out>/runs/<arm>/<case>__r<rep>.json (resumable: finished runs are skipped).
 Author: Alex Camacho Castilho

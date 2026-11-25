@@ -157,6 +157,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--split", default="holdout")
     ap.add_argument("--report", required=True)
+    ap.add_argument("--candidate", default="skill", help="arm the gates are applied to")
     args = ap.parse_args()
     out = pathlib.Path(args.out)
     cases = {c["id"]: c for c in load_corpus(args.split)}
@@ -164,7 +165,7 @@ def main():
     judgments = load(out, "judgments", cases)
     arms = arm_stats(runs, cases)
     pairs, fidelity, naturalness = pair_stats(judgments)
-    g = gates(arms, pairs, fidelity)
+    g = gates(arms, pairs, fidelity, args.candidate)
     rep = pathlib.Path(args.report)
     rep.mkdir(parents=True, exist_ok=True)
     (rep / "summary.json").write_text(json.dumps({"split": args.split, "arms": arms, "pairs": pairs, "fidelity": fidelity, "naturalness": naturalness, "gates": g}, ensure_ascii=False, indent=1), encoding="utf-8")

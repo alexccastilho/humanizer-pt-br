@@ -1,0 +1,200 @@
+{
+ "split": "holdout",
+ "arms": {
+  "baseline": {
+   "runs": 136,
+   "empty": 0,
+   "skill_triggered": 0,
+   "failures": {
+    "protected": 6,
+    "numbers_missing": 4,
+    "numbers_added": 12,
+    "dashes": 2,
+    "preamble": 38,
+    "punctuation": 0,
+    "falta_fonte_missing": 2,
+    "falta_fonte_spurious": 0
+   },
+   "rewrites": 134,
+   "runs_with_any_failure": 58,
+   "dashes_output_total": 6,
+   "length_ratio_ai_median": 1.155,
+   "similarity_clean_median": 0.426,
+   "input_tokens_median": 7362.5,
+   "output_tokens_median": 467.0,
+   "cost_usd_mean": 0.02831,
+   "output_words_median": 174.5
+  },
+  "cand": {
+   "runs": 136,
+   "empty": 0,
+   "skill_triggered": 130,
+   "failures": {
+    "protected": 0,
+    "numbers_missing": 1,
+    "numbers_added": 0,
+    "dashes": 2,
+    "preamble": 0,
+    "punctuation": 0,
+    "falta_fonte_missing": 0,
+    "falta_fonte_spurious": 0
+   },
+   "rewrites": 134,
+   "runs_with_any_failure": 3,
+   "dashes_output_total": 6,
+   "length_ratio_ai_median": 0.741,
+   "similarity_clean_median": 0.877,
+   "input_tokens_median": 19085.0,
+   "output_tokens_median": 531.5,
+   "cost_usd_mean": 0.04561,
+   "output_words_median": 101.0
+  },
+  "minimal": {
+   "runs": 136,
+   "empty": 0,
+   "skill_triggered": 0,
+   "failures": {
+    "protected": 2,
+    "numbers_missing": 0,
+    "numbers_added": 1,
+    "dashes": 2,
+    "preamble": 0,
+    "punctuation": 0,
+    "falta_fonte_missing": 2,
+    "falta_fonte_spurious": 0
+   },
+   "rewrites": 134,
+   "runs_with_any_failure": 7,
+   "dashes_output_total": 6,
+   "length_ratio_ai_median": 0.861,
+   "similarity_clean_median": 0.859,
+   "input_tokens_median": 7475.5,
+   "output_tokens_median": 316.0,
+   "cost_usd_mean": 0.02745,
+   "output_words_median": 108.0
+  },
+  "skill": {
+   "runs": 136,
+   "empty": 0,
+   "skill_triggered": 131,
+   "failures": {
+    "protected": 0,
+    "numbers_missing": 0,
+    "numbers_added": 1,
+    "dashes": 1,
+    "preamble": 0,
+    "punctuation": 0,
+    "falta_fonte_missing": 0,
+    "falta_fonte_spurious": 0
+   },
+   "rewrites": 134,
+   "runs_with_any_failure": 2,
+   "dashes_output_total": 5,
+   "length_ratio_ai_median": 0.74,
+   "similarity_clean_median": 0.871,
+   "input_tokens_median": 19572.0,
+   "output_tokens_median": 541.0,
+   "cost_usd_mean": 0.04741,
+   "output_words_median": 99.5
+  }
+ },
+ "pairs": {
+  "cand_vs_baseline": {
+   "x": "cand",
+   "y": "baseline",
+   "n": 136,
+   "wins_x": 124,
+   "wins_y": 12,
+   "ties": 0,
+   "win_rate_x": 0.912,
+   "ci95": [
+    0.852,
+    0.949
+   ],
+   "position_A_wins": 73,
+   "position_B_wins": 63
+  },
+  "cand_vs_minimal": {
+   "x": "cand",
+   "y": "minimal",
+   "n": 136,
+   "wins_x": 83,
+   "wins_y": 52,
+   "ties": 1,
+   "win_rate_x": 0.615,
+   "ci95": [
+    0.531,
+    0.693
+   ],
+   "position_A_wins": 66,
+   "position_B_wins": 69
+  },
+  "cand_vs_skill": {
+   "x": "cand",
+   "y": "skill",
+   "n": 136,
+   "wins_x": 61,
+   "wins_y": 68,
+   "ties": 7,
+   "win_rate_x": 0.473,
+   "ci95": [
+    0.389,
+    0.559
+   ],
+   "position_A_wins": 64,
+   "position_B_wins": 65
+  },
+  "skill_vs_baseline": {
+   "x": "skill",
+   "y": "baseline",
+   "n": 136,
+   "wins_x": 124,
+   "wins_y": 12,
+   "ties": 0,
+   "win_rate_x": 0.912,
+   "ci95": [
+    0.852,
+    0.949
+   ],
+   "position_A_wins": 79,
+   "position_B_wins": 57
+  }
+ },
+ "fidelity": {
+  "cand": {
+   "mean_errors": 0.784,
+   "outputs_with_error": 0.507,
+   "n": 408
+  },
+  "baseline": {
+   "mean_errors": 2.191,
+   "outputs_with_error": 0.857,
+   "n": 272
+  },
+  "minimal": {
+   "mean_errors": 1,
+   "outputs_with_error": 0.596,
+   "n": 136
+  },
+  "skill": {
+   "mean_errors": 0.812,
+   "outputs_with_error": 0.533,
+   "n": 272
+  }
+ },
+ "naturalness": {
+  "cand": 7.13,
+  "baseline": 6.96,
+  "minimal": 6.61,
+  "skill": 7.23
+ },
+ "gates": {
+  "G0 dados suficientes (>= 30 reescritas por braço)": true,
+  "G1 trechos protegidos intactos (cand)": true,
+  "G2 números: cand não pior que baseline": true,
+  "G3 fidelidade (juiz): cand não pior que baseline": true,
+  "G4 preferência cand x baseline >= 60% e IC acima de 50%": true,
+  "G5 cand não perde do prompt mínimo (IC superior >= 50%)": true,
+  "T economia de tokens real (custo médio cand <= baseline)": false
+ }
+}

@@ -2,6 +2,24 @@
 
 Todas as mudanças relevantes desta skill. O formato segue o [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) e o versionamento segue o [SemVer](https://semver.org/lang/pt-BR/).
 
+## [3.0.0] - 2026-11-25
+
+Primeira versão medida contra o Claude sem skill. Os números estão em [evals/results/3.0.0/holdout.md](evals/results/3.0.0/holdout.md).
+
+### Alterado
+- **Nome.** `humanizer-token-optimizer-pt-br` passa a ser `humanizer-pt-br` (skill, plugin e repositório), e o marketplace passa a ser `alexccastilho-humanizer`. O benchmark mostrou que a skill custa cerca de 60% mais por pedido do que o Claude sem skill, então o nome não podia prometer economia de tokens. Mudança incompatível: veja "Atualizando da v2" no README.
+- **Vocabulário.** A lista de palavras suspeitas saiu da skill. No conjunto de reserva, a versão sem a lista empatou com a versão com lista (47% x 53%, diferença dentro da margem), com arquivo 13% menor e sem uma lista fixa para envelhecer. A lista antiga ficou em `evals/suspeitos.md`, só para medição.
+- **Gatilho.** A descrição passa a citar "deixar mais formal ou mais informal".
+- **Travessão.** `[TRAVESSAO: OK]` mantém os travessões que já estavam no original e nunca cria travessão novo.
+
+### Adicionado
+- `evals/`: benchmark reproduzível com braços isolados (sem skill, prompt mínimo, skill, ablação, candidata), juiz cego com ordem sorteada, checador determinístico (trechos protegidos, números, travessão, preâmbulo, `Falta fonte:`), critérios de decisão fixados antes da rodada, teste de acionamento e relatório de vocabulário.
+- `tests/` e CI no GitHub Actions (Linux e Windows, Python 3.8 em diante), sem chamar modelo: checador, manifestos, versões, exemplos da própria skill e pacote ZIP.
+- `.gitattributes` com fim de linha LF; o ZIP sai igual no Windows e no Linux.
+
+### Corrigido
+- O marketplace usava o nome `alexccastilho-skills`, o mesmo de outro plugin do autor, e um podia sobrescrever o outro.
+
 ## [2.0.0] - 2026-11-16
 
 Revisão completa. O detalhamento de cada problema e correção está em [docs/ANALISE.md](docs/ANALISE.md).

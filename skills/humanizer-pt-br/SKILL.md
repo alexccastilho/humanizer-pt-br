@@ -1,5 +1,5 @@
 ---
-name: humanizer-token-optimizer-pt-br
+name: humanizer-pt-br
 description: >
   Humaniza textos em Português do Brasil (pt-BR): remove marcas de escrita de IA
   (travessões, clichês, fórmulas, enchimento) e reescreve com voz natural, sem
@@ -14,7 +14,7 @@ description: >
 license: MIT
 metadata:
   author: Alex Camacho Castilho
-  version: "2.0.0"
+  version: "3.0.0"
 ---
 
 # Humanizador pt-BR
