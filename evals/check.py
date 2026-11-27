@@ -6,18 +6,22 @@ so it runs in CI and gives the same answer every time.
 What it checks:
   protected   every protected span (declared in the case, plus URLs, e-mails, @mentions,
               #hashtags, inline code and quoted text found in the source) appears verbatim
-  numbers     every number in the source is still there, and no new number appeared
-  dashes      dashes used as an aside or pause in prose (travessão, meia-risca, spaced
-              hyphen); with the [TRAVESSAO: OK] tag, the output may not have more than
-              the source
+              in the rewritten text (the trailing "Falta fonte:" line does not count)
+  numbers     every number in the source is still there, and no new number appeared;
+              a number repeated fewer times than in the source is reported, not failed
+  dashes      dashes used as an aside or pause in prose, list items and headings
+              (travessão, meia-risca, spaced hyphen); with the [TRAVESSAO: OK] tag, the
+              output may not have more than the source
   preamble    chatbot opening or closing ("Aqui está", "Se quiser, posso...")
-  punctuation "!!", "?!", arrows and inline bullets in prose
+  punctuation "!!", "?!", more than one "!" per block, arrows, inline bullets and "&"
+              standing in for "e" in prose
   falta_fonte the "Falta fonte:" line, when the case expects it
   length      word ratio output/source; similarity for texts that should barely change
 
 Standard library only, Python 3.8+.
 Author: Alex Camacho Castilho
 """
+import collections
 import difflib
 import re
 
@@ -43,7 +47,12 @@ PREAMBLE_END = re.compile(
 
 LIST_MARKER = re.compile(r"^\s*([-*•]|\d+[.)])\s")
 DIALOGUE = re.compile(r"^\s*[—–]\s*\S")
-LABEL = re.compile(r"^[^.!?\n]{1,60}\s[-–—]\s[^.!?\n]{1,60}$")  # "Nome - Cargo", "Assessoria – Empresa"
+# "Nome - Cargo", "Assessoria – Empresa", "Contato - 11 9999-0000": a single dash, and
+# what follows starts with a capital or a digit. A lowercase continuation is prose.
+LABEL = re.compile(r"^[^.!?\n–—]{1,60}\s[-–—]\s[A-ZÀ-Ý0-9][^.!?\n–—]{0,60}$")
+HEADING = re.compile(r"^#{1,6}\s+")
+AMPERSAND = re.compile(r"\S\s&\s[a-zà-ÿ]")  # "vendas & marketing"; "Johnson & Johnson" is a name
+URL_TRAIL = ".,;:!?)"
 RANGE = re.compile(r"\d\s?[-–—]\s?\d")
 
 
@@ -56,7 +65,7 @@ def protected_spans(source, case=None):
     spans = list((case or {}).get("protected", []))
     body = _strip_fences(source)
     for rx in (URL, EMAIL, CODE, QUOTE):
-        spans += [m.group(0).rstrip(".,;)") if rx is URL else m.group(0) for m in rx.finditer(body)]
+        spans += [m.group(0).rstrip(URL_TRAIL) if rx is URL else m.group(0) for m in rx.finditer(body)]
     for rx in (MENTION, HASHTAG):
         spans += [m.group(0) for m in rx.finditer(EMAIL.sub(" ", URL.sub(" ", body)))]
     for block in FENCE.findall(source):
@@ -98,16 +107,29 @@ def number_diff(source, output):
     return missing, added
 
 
-def _prose_lines(text, case=None):
-    """Lines of prose: no code, no list markers, no fiction dialogue, no labels."""
+def number_count_changed(source, output):
+    """Numbers kept in the output but repeated fewer times than in the source ("10 e 10"
+    -> "10"). Reported for review, not failed: merging a repeated year is often a fair
+    edit, losing one of two equal quantities is not, and only a reader can tell."""
+    src, out = collections.Counter(numbers(source)), collections.Counter(numbers(output))
+    return [n for n in src if 0 < out[n] < src[n]]
+
+
+def _prose_lines(text, case=None, lists=True):
+    """Lines of prose, with list markers and heading marks taken off so the text of a
+    list item or heading is checked too (lists=False leaves list items out). Skipped:
+    code, tables, block quotes, fiction dialogue and labels ("Nome - Cargo")."""
     lines = []
     for line in _strip_fences(text).splitlines():
         s = line.strip()
-        if not s or LIST_MARKER.match(s) or DIALOGUE.match(s) or s.startswith(("#", "|", ">")):
+        if not s or DIALOGUE.match(s) or s.startswith(("|", ">")):
             continue
-        if LABEL.match(s) and len(s) < 90:
+        if not lists and LIST_MARKER.match(s):
             continue
-        lines.append(line)
+        s = HEADING.sub("", LIST_MARKER.sub("", s, count=1), count=1).strip()
+        if not s or LABEL.match(s):
+            continue
+        lines.append(s)
     return lines
 
 
@@ -135,17 +157,33 @@ def preamble(output):
     found = []
     if PREAMBLE_START.search(lines[0]):
         found.append(lines[0][:80])
-    if len(lines) > 1 and PREAMBLE_END.search(lines[-1]):
-        found.append(lines[-1][:80])
+    last = lines[-1]
+    if len(lines) == 1:
+        # One-line answer: only a closing sentence after the text counts, so a text that
+        # is itself one sentence ("Caso queira participar, ...") is not flagged.
+        sentences = re.split(r"(?<=[.!?])\s+", last.strip())
+        last = sentences[-1] if len(sentences) > 1 else ""
+    if last and PREAMBLE_END.search(last):
+        found.append(last[:80])
     return found
 
 
-def punctuation(output):
-    found = []
-    prose = "\n".join(_prose_lines(output))
-    for token in ("!!", "?!", "→", " • "):
-        if token in prose:
-            found.append(token.strip())
+def punctuation(output, spans=()):
+    """Punctuation the skill removes from prose (§3). List items are left out, since an
+    arrow in a step list ("Arquivo → Salvar") is not prose. Protected spans are taken out
+    first, so a quote with "!" or a brand like "P&D" does not count."""
+    blocks = []
+    for b in re.split(r"\n\s*\n", _strip_fences(output)):
+        text = "\n".join(_prose_lines(b, lists=False))
+        for s in spans:
+            text = text.replace(s, " ")
+        blocks.append(text)
+    prose = "\n".join(blocks)
+    found = [t.strip() for t in ("!!", "?!", "→", " • ") if t in prose]
+    if "!!" not in found and any(b.count("!") > 1 for b in blocks):
+        found.append("!")
+    if AMPERSAND.search(prose):
+        found.append("&")
     return found
 
 
@@ -166,16 +204,19 @@ def check(source, output, case=None):
     m = re.search(r"(?:\n\s*Falta fonte:[^\n]*)+\s*$", output)
     body = output[:m.start()] if m else output
     missing, added = number_diff(source, body)
-    miss_prot = missing_protected(source, output, case)
+    # Spans must survive in the rewrite itself: one that only shows up in the trailing
+    # "Falta fonte:" line was still dropped from the text.
+    miss_prot = missing_protected(source, body, case)
     src_spans = protected_spans(source, case)
     src_d, out_d = aside_dashes(source, case, src_spans), aside_dashes(body, case, src_spans)
     pre = preamble(body)
-    punct = punctuation(body)
+    punct = punctuation(body, src_spans)
     has_ff = bool(m)
     r = {
         "protected_missing": miss_prot,
         "numbers_missing": missing,
         "numbers_added": added,
+        "numbers_count_changed": number_count_changed(source, body),
         "dashes_source": len(src_d),
         "dashes_output": len(out_d),
         "dash_examples": out_d[:3],

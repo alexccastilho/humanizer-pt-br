@@ -98,10 +98,11 @@ class Package(unittest.TestCase):
                            check=True, capture_output=True)
             zips = list(pathlib.Path(tmp).glob("*.zip"))
             self.assertEqual(len(zips), 1)
-            names = zipfile.ZipFile(zips[0]).namelist()
+            with zipfile.ZipFile(zips[0]) as zf:
+                names = zf.namelist()
+                data = zf.read(f"{SKILLS[0].name}/SKILL.md")
             self.assertIn(f"{SKILLS[0].name}/SKILL.md", names)
             self.assertFalse([n for n in names if "\\" in n])
-            data = zipfile.ZipFile(zips[0]).read(f"{SKILLS[0].name}/SKILL.md")
             self.assertNotIn(b"\r\n", data)
 
 

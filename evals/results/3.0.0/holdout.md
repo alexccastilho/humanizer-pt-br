@@ -2,12 +2,12 @@
 
 ## Checagens determinísticas por braço
 
-| Braço | Execuções | Acionou skill | Com alguma falha | Protegidos | Nº sumiu | Nº novo | Travessão | Preâmbulo | Falta fonte ausente | Tamanho (IA, mediana) | Similaridade texto bom | Tokens entrada (med.) | Tokens saída (med.) | Custo médio US$ |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| baseline | 136 | 0 | 58/134 | 6 | 4 | 12 | 2 | 38 | 2 | 1.155 | 0.426 | 7362.5 | 467.0 | 0.02831 |
-| cand | 136 | 130 | 3/134 | 0 | 1 | 0 | 2 | 0 | 0 | 0.741 | 0.877 | 19085.0 | 531.5 | 0.04561 |
-| minimal | 136 | 0 | 7/134 | 2 | 0 | 1 | 2 | 0 | 2 | 0.861 | 0.859 | 7475.5 | 316.0 | 0.02745 |
-| skill | 136 | 131 | 2/134 | 0 | 0 | 1 | 1 | 0 | 0 | 0.74 | 0.871 | 19572.0 | 541.0 | 0.04741 |
+| Braço | Execuções | Acionou skill | Com alguma falha | Vazia | Protegidos | Nº sumiu | Nº novo | Travessão | Preâmbulo | Pontuação | Falta fonte ausente | Tamanho (IA, mediana) | Similaridade texto bom | Tokens entrada (med.) | Tokens saída (med.) | Custo médio US$ |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| baseline | 136 | 0 | 59/134 | 0 | 6 | 4 | 12 | 4 | 38 | 1 | 2 | 1.155 | 0.426 | 7362.5 | 467.0 | 0.02831 |
+| cand | 136 | 130 | 3/134 | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 0 | 0.741 | 0.877 | 19085.0 | 531.5 | 0.04561 |
+| minimal | 136 | 0 | 10/134 | 0 | 2 | 0 | 1 | 2 | 0 | 3 | 2 | 0.861 | 0.859 | 7475.5 | 316.0 | 0.02745 |
+| skill | 136 | 131 | 4/134 | 0 | 0 | 0 | 1 | 1 | 0 | 2 | 0 | 0.74 | 0.871 | 19572.0 | 541.0 | 0.04741 |
 
 ## Preferência do juiz cego
 
@@ -29,7 +29,7 @@
 
 ## Critérios de decisão
 
-- PASSOU: G0 dados suficientes (>= 30 reescritas por braço)
+- PASSOU: G0 dados suficientes (>= 30 reescritas por braço e por par julgado)
 - PASSOU: G1 trechos protegidos intactos (cand)
 - PASSOU: G2 números: cand não pior que baseline
 - PASSOU: G3 fidelidade (juiz): cand não pior que baseline

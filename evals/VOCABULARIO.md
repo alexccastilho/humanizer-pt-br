@@ -22,6 +22,6 @@ A lista antiga continua em `suspeitos.md`, como régua de medição. Este proces
 
 ## O que a revisão de 25/11/2026 mostrou
 
-- No texto natural de Claude Haiku, Sonnet e Opus 5.5, nenhum dos 56 suspeitos apareceu. Os vícios estão no texto carregado que as pessoas colam, vindo de outros modelos ou de versões antigas.
+- No texto natural de Claude Haiku, Sonnet e Opus 5.5, 3 dos 59 suspeitos apareceram, em 4 ocorrências: "jornada" uma vez no sentido figurado (Haiku, "fazem parte dessa jornada"), "ecossistema" uma vez no sentido literal (Sonnet, sobre mata nativa) e "Alicerce" duas vezes como nome próprio de uma construtora (Opus). Os vícios estão no texto carregado que as pessoas colam, vindo de outros modelos ou de versões antigas. (Contagem refeita em 27/11/2026 com o `vocab_report.py` corrigido; a versão anterior desta frase falava em 56 suspeitos e nenhuma ocorrência.)
 - Depois de um pedido simples para humanizar sem a skill, o Claude ainda deixou "inovador", "robusto", "vale ressaltar", "crucial" e "dinâmico".
 - No conjunto de desenvolvimento, a versão sem lista pareceu melhor que a com lista (28 a 11), mas no conjunto de reserva as duas empataram (47% x 53%). Uma tentativa intermediária, com lista curta e regra para manter adjetivos que são afirmação, empatou com a v2.0 e foi descartada.

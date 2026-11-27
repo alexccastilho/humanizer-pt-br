@@ -14,7 +14,7 @@ description: >
 license: MIT
 metadata:
   author: Alex Camacho Castilho
-  version: "3.0.0"
+  version: "3.0.1"
 ---
 
 # Humanizador pt-BR

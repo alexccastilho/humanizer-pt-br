@@ -20,7 +20,7 @@ sys.path.insert(0, str(HERE))
 from check import check  # noqa: E402
 from run import load_corpus  # noqa: E402
 
-HARD = ("protected", "numbers_missing", "numbers_added", "dashes", "preamble", "punctuation",
+HARD = ("empty", "protected", "numbers_missing", "numbers_added", "dashes", "preamble", "punctuation",
         "falta_fonte_missing")
 
 
@@ -55,24 +55,28 @@ def arm_stats(runs, cases):
         by[r["arm"]].append(r)
     stats = {}
     for arm, rs in sorted(by.items()):
-        rewrite = [r for r in rs if r.get("check") and cases[r["case"]].get("expect", {}).get("mode") != "diagnosis"]
-        fails = collections.Counter(f for r in rewrite for f in r["check"]["failures"])
-        unchanged = [r["check"]["similarity"] for r in rewrite if cases[r["case"]].get("expect", {}).get("unchanged")]
-        ai = [r["check"]["length_ratio"] for r in rewrite if cases[r["case"]]["origin"].startswith("ai-")]
+        # An empty answer to a rewrite request is a failed rewrite, not a missing data point.
+        rewrite = [r for r in rs if cases[r["case"]].get("expect", {}).get("mode") != "diagnosis"]
+        checked = [r for r in rewrite if r.get("check")]
+        fails = collections.Counter(f for r in checked for f in r["check"]["failures"])
+        fails["empty"] = len(rewrite) - len(checked)
+        unchanged = [r["check"]["similarity"] for r in checked if cases[r["case"]].get("expect", {}).get("unchanged")]
+        ai = [r["check"]["length_ratio"] for r in checked if cases[r["case"]]["origin"].startswith("ai-")]
         st = {
             "runs": len(rs),
             "empty": sum(1 for r in rs if not r.get("output")),
             "skill_triggered": sum(1 for r in rs if r.get("skill_calls")),
             "failures": {k: fails.get(k, 0) for k in HARD + ("falta_fonte_spurious",)},
             "rewrites": len(rewrite),
-            "runs_with_any_failure": sum(1 for r in rewrite if r["check"]["failures"]),
-            "dashes_output_total": sum(r["check"]["dashes_output"] for r in rewrite),
+            "runs_with_any_failure": sum(1 for r in rewrite if not r.get("check") or r["check"]["failures"]),
+            "numbers_count_changed": sum(1 for r in checked if r["check"].get("numbers_count_changed")),
+            "dashes_output_total": sum(r["check"]["dashes_output"] for r in checked),
             "length_ratio_ai_median": round(statistics.median(ai), 3) if ai else None,
             "similarity_clean_median": round(statistics.median(unchanged), 3) if unchanged else None,
             "input_tokens_median": statistics.median([tokens_in(r.get("usage") or {}) for r in rs]) if rs else None,
             "output_tokens_median": statistics.median([(r.get("usage") or {}).get("output_tokens") or 0 for r in rs]) if rs else None,
             "cost_usd_mean": round(statistics.mean([r.get("cost_usd") or 0 for r in rs]), 5) if rs else None,
-            "output_words_median": statistics.median([r["check"]["words_output"] for r in rewrite]) if rewrite else None,
+            "output_words_median": statistics.median([r["check"]["words_output"] for r in checked]) if checked else None,
         }
         stats[arm] = st
     return stats
@@ -83,8 +87,11 @@ def pair_stats(judgments):
     for j in judgments:
         by[j["pair"]].append(j)
     res = {}
-    fid = collections.defaultdict(list)
-    nat = collections.defaultdict(list)
+    # One output (arm, case, rep) is judged once per pair it appears in. Average the
+    # judgments of each output first, so n is the number of outputs and an arm that sits
+    # in more pairs does not weigh more.
+    fid = collections.defaultdict(lambda: collections.defaultdict(list))
+    nat = collections.defaultdict(lambda: collections.defaultdict(list))
     for pair, js in sorted(by.items()):
         x, y = js[0]["x"], js[0]["y"]
         wx = sum(1 for j in js if j["winner"] == x)
@@ -96,13 +103,19 @@ def pair_stats(judgments):
                      "win_rate_x": round(p, 3), "ci95": [round(lo, 3), round(hi, 3)],
                      "position_A_wins": pos_a, "position_B_wins": sum(1 for j in js if j["position_winner"] == "B")}
         for j in js:
+            key = (j["case"], j["rep"])
             for arm, errs in j["fidelity"].items():
-                fid[arm].append(len(errs or []))
+                fid[arm][key].append(len(errs or []))
             for arm, v in j["naturalness"].items():
                 if isinstance(v, (int, float)):
-                    nat[arm].append(v)
-    fidelity = {a: {"mean_errors": round(statistics.mean(v), 3), "outputs_with_error": round(sum(1 for e in v if e) / len(v), 3), "n": len(v)} for a, v in fid.items()}
-    naturalness = {a: round(statistics.mean(v), 2) for a, v in nat.items()}
+                    nat[arm][key].append(v)
+    fidelity = {}
+    for a, outs in fid.items():
+        errs = [statistics.mean(v) for v in outs.values()]
+        flagged = [sum(1 for e in v if e) / len(v) for v in outs.values()]
+        fidelity[a] = {"mean_errors": round(statistics.mean(errs), 3),
+                       "outputs_with_error": round(statistics.mean(flagged), 3), "n": len(outs)}
+    naturalness = {a: round(statistics.mean(statistics.mean(v) for v in outs.values()), 2) for a, outs in nat.items()}
     return res, fidelity, naturalness
 
 
@@ -114,8 +127,11 @@ def gates(arms, pairs, fidelity, candidate="skill"):
     g = {}
     s = arms.get(candidate, {})
     b = arms.get("baseline", {})
-    enough = s.get("rewrites", 0) >= MIN_RUNS and b.get("rewrites", 0) >= MIN_RUNS
-    g[f"G0 dados suficientes (>= {MIN_RUNS} reescritas por braço)"] = enough
+    need_arms = (candidate, "baseline", "minimal")
+    need_pairs = (f"{candidate}_vs_baseline", f"{candidate}_vs_minimal")
+    enough = (all(arms.get(a, {}).get("rewrites", 0) >= MIN_RUNS for a in need_arms)
+              and all(pairs.get(p, {}).get("n", 0) >= MIN_RUNS for p in need_pairs))
+    g[f"G0 dados suficientes (>= {MIN_RUNS} reescritas por braço e por par julgado)"] = enough
     if not enough:
         return g
     c = candidate
@@ -136,11 +152,11 @@ def gates(arms, pairs, fidelity, candidate="skill"):
 def render(split, arms, pairs, fidelity, naturalness, g):
     L = [f"# Resultado do benchmark ({split})", ""]
     L += ["## Checagens determinísticas por braço", "",
-          "| Braço | Execuções | Acionou skill | Com alguma falha | Protegidos | Nº sumiu | Nº novo | Travessão | Preâmbulo | Falta fonte ausente | Tamanho (IA, mediana) | Similaridade texto bom | Tokens entrada (med.) | Tokens saída (med.) | Custo médio US$ |",
-          "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+          "| Braço | Execuções | Acionou skill | Com alguma falha | Vazia | Protegidos | Nº sumiu | Nº novo | Travessão | Preâmbulo | Pontuação | Falta fonte ausente | Tamanho (IA, mediana) | Similaridade texto bom | Tokens entrada (med.) | Tokens saída (med.) | Custo médio US$ |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     for a, s in arms.items():
         f = s["failures"]
-        L.append(f"| {a} | {s['runs']} | {s['skill_triggered']} | {s['runs_with_any_failure']}/{s['rewrites']} | {f['protected']} | {f['numbers_missing']} | {f['numbers_added']} | {f['dashes']} | {f['preamble']} | {f['falta_fonte_missing']} | {s['length_ratio_ai_median']} | {s['similarity_clean_median']} | {s['input_tokens_median']} | {s['output_tokens_median']} | {s['cost_usd_mean']} |")
+        L.append(f"| {a} | {s['runs']} | {s['skill_triggered']} | {s['runs_with_any_failure']}/{s['rewrites']} | {f['empty']} | {f['protected']} | {f['numbers_missing']} | {f['numbers_added']} | {f['dashes']} | {f['preamble']} | {f['punctuation']} | {f['falta_fonte_missing']} | {s['length_ratio_ai_median']} | {s['similarity_clean_median']} | {s['input_tokens_median']} | {s['output_tokens_median']} | {s['cost_usd_mean']} |")
     L += ["", "## Preferência do juiz cego", "", "| Par | n | Vitórias 1º | Vitórias 2º | Empates | Taxa 1º (sem empates) | IC 95% | Venceu posição A/B |", "|---|---|---|---|---|---|---|---|"]
     for p, s in pairs.items():
         L.append(f"| {s['x']} x {s['y']} | {s['n']} | {s['wins_x']} | {s['wins_y']} | {s['ties']} | {s['win_rate_x']:.0%} | {s['ci95'][0]:.0%} a {s['ci95'][1]:.0%} | {s['position_A_wins']}/{s['position_B_wins']} |")
@@ -168,9 +184,12 @@ def main():
     g = gates(arms, pairs, fidelity, args.candidate)
     rep = pathlib.Path(args.report)
     rep.mkdir(parents=True, exist_ok=True)
-    (rep / "summary.json").write_text(json.dumps({"split": args.split, "arms": arms, "pairs": pairs, "fidelity": fidelity, "naturalness": naturalness, "gates": g}, ensure_ascii=False, indent=1), encoding="utf-8")
+    summary = json.dumps({"split": args.split, "arms": arms, "pairs": pairs, "fidelity": fidelity,
+                          "naturalness": naturalness, "gates": g}, ensure_ascii=False, indent=1)
     md = render(args.split, arms, pairs, fidelity, naturalness, g)
-    (rep / "summary.md").write_text(md, encoding="utf-8")
+    for name, text in (("summary.json", summary), ("summary.md", md)):
+        with open(rep / name, "w", encoding="utf-8", newline="\n") as fh:  # LF on every OS
+            fh.write(text)
     print(md)
 
 
