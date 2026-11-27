@@ -47,12 +47,28 @@ def suspects():
     return terms
 
 
+# Endings a root may take back: gender and number, and the common verb forms. A closed
+# list, so "universo" matches "universos" but not "Universidade".
+INFLECTION = (r"(?:o|a|os|as|e|es|s|ar|er|ir|ando|endo|indo|ado|ada|ados|adas|ido|ida|idos|idas|"
+              r"am|em|ou|eu|iu|amos|emos|imos|aram|eram|iram|ava|avam|ia|iam|ará|erá|irá)?")
+
+
 def stem_rx(term):
-    """Loose match: verb and adjective endings vary (mergulhar, mergulhando, robustas)."""
+    """Loose match: verb and adjective endings vary (mergulhar, mergulhando, robustas).
+    A function word at the end (de, que) is matched whole, and the "X" of the list
+    ("um verdadeiro X") stands for any word."""
     words = term.split()
+    head = r"\s+".join(map(re.escape, words[:-1]))
     last = words[-1]
-    root = re.sub(r"(ar|er|ir|o|a|os|as|e|es)$", "", last) if len(last) > 5 else last
-    return re.compile(r"\b" + r"\s+".join(map(re.escape, words[:-1] + [root])) + r"\w*\b", re.I)
+    if last == "x":
+        tail = r"\w+"
+    elif last in STOP:
+        tail = re.escape(last)
+    elif len(last) > 5:
+        tail = re.escape(re.sub(r"(ar|er|ir|o|a|os|as|e|es)$", "", last)) + INFLECTION
+    else:
+        tail = re.escape(last) + INFLECTION  # pilar -> pilares
+    return re.compile(r"\b" + (head + r"\s+" if head else "") + tail + r"\b", re.I)
 
 
 def per10k(count, words):

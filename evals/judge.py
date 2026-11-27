@@ -6,8 +6,11 @@ it is random across cases but stable between runs. The judge runs isolated, like
 arms (see claude_cli.py), on a stronger model than the one under test.
 
 Usage:
-  python evals/judge.py --out <same folder as run.py> [--pairs skill:baseline,skill:minimal,skill:novocab]
-      [--model opus] [--jobs 4] [--split holdout]
+  python evals/judge.py --out <same folder as run.py> [--pairs skill:baseline,skill:minimal]
+      [--model opus] [--jobs 4] [--split holdout] [--reps 3]
+
+The default pairs match the default arms of run.py. Add skill:novocab or cand:skill only
+when those arms were run.
 
 Results: <out>/judgments/<a>_vs_<b>/<case>__r<rep>.json
 Author: Alex Camacho Castilho
@@ -25,6 +28,8 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from claude_cli import run_claude  # noqa: E402
 from run import load_corpus  # noqa: E402
+
+DEFAULT_PAIRS = "skill:baseline,skill:minimal"
 
 PROMPT = """Você é um editor brasileiro experiente. Avalie duas reescritas do mesmo texto, feitas a pedido de um usuário.
 
@@ -71,6 +76,11 @@ def parse_json(text):
         return None
 
 
+def valid_verdict(verdict):
+    """A usable answer names a winner. Valid JSON without one is a failed judgment."""
+    return isinstance(verdict, dict) and verdict.get("vencedor") in ("A", "B", "empate")
+
+
 def judge_one(case, rep, x, y, out, model):
     pair = f"{x}_vs_{y}"
     dest = out / "judgments" / pair / f"{case['id']}__r{rep}.json"
@@ -89,9 +99,9 @@ def judge_one(case, rep, x, y, out, model):
         nonce = secrets.token_hex(6)
         res = run_claude(PROMPT.format(request=case["request"], source=case["text"], a=a, b=b, nonce=nonce), model=model)
         verdict = parse_json(res.get("result"))
-        if verdict and verdict.get("vencedor") in ("A", "B", "empate"):
+        if valid_verdict(verdict):
             break
-    if not verdict:
+    if not valid_verdict(verdict):
         print("FAIL judge", pair, case["id"], rep, file=sys.stderr)
         return None
     side = {"A": y if flipped else x, "B": x if flipped else y}
@@ -113,7 +123,7 @@ def judge_one(case, rep, x, y, out, model):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
-    ap.add_argument("--pairs", default="skill:baseline,skill:minimal,skill:novocab")
+    ap.add_argument("--pairs", default=DEFAULT_PAIRS)
     ap.add_argument("--model", default="opus")
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--split", default="all")

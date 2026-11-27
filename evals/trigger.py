@@ -48,36 +48,61 @@ SHOULD_NOT = [
 ]
 
 
-def main():
+def classify(res, name):
+    """fired is True/False when the run worked, None when it failed: a failed run says
+    nothing about the description and must not count as "did not trigger"."""
+    if res.get("is_error"):
+        return {"fired": None, "error": res.get("error") or "is_error"}
+    if "is_error" not in res:  # the CLI died before its final "result" event
+        return {"fired": None, "error": f"sem resultado (exit {res.get('exit_code')}): {(res.get('stderr_tail') or '')[-120:]}"}
+    return {"fired": any(name in (s or "") for s in res.get("skill_calls", [])), "error": None}
+
+
+def parser():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--skill-dir", default=str(next(p for p in (ROOT / "skills").iterdir() if (p / "SKILL.md").is_file())))
     ap.add_argument("--label", default="cand")
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--jobs", type=int, default=6)
-    args = ap.parse_args()
+    ap.add_argument("--reps", type=int, default=1, help="runs per request")
+    return ap
+
+
+def main():
+    args = parser().parse_args()
     plugin = export_plugin(args.out, args.skill_dir, f"trigger_{args.label}")
     name = pathlib.Path(args.skill_dir).name
-    jobs = [(q, True) for q in SHOULD] + [(q, False) for q in SHOULD_NOT]
+    jobs = [(q, exp, rep) for q, exp in [(q, True) for q in SHOULD] + [(q, False) for q in SHOULD_NOT]
+            for rep in range(1, args.reps + 1)]
 
     def work(job):
-        q, expected = job
+        q, expected, rep = job
         res = run_claude(q, model=args.model, plugin_dir=plugin)
-        fired = any(name in (s or "") for s in res.get("skill_calls", []))
-        return {"query": q, "expected": expected, "fired": fired}
+        return {"query": q, "expected": expected, "rep": rep, **classify(res, name)}
 
     with concurrent.futures.ThreadPoolExecutor(args.jobs) as ex:
         results = list(ex.map(work, jobs))
-    tp = sum(r["fired"] for r in results if r["expected"])
-    fp = sum(r["fired"] for r in results if not r["expected"])
-    summary = {"label": args.label, "should_fire": len(SHOULD), "fired_when_should": tp,
-               "should_not_fire": len(SHOULD_NOT), "fired_when_should_not": fp, "results": results}
+    ok = [r for r in results if r["error"] is None]
+    errors = [r for r in results if r["error"] is not None]
+    pos = [r for r in ok if r["expected"]]
+    neg = [r for r in ok if not r["expected"]]
+    tp = sum(r["fired"] for r in pos)
+    fp = sum(r["fired"] for r in neg)
+    summary = {"label": args.label, "reps": args.reps, "should_fire": len(pos), "fired_when_should": tp,
+               "should_not_fire": len(neg), "fired_when_should_not": fp, "errors": len(errors),
+               "results": results}
     dest = pathlib.Path(args.out) / f"trigger_{args.label}.json"
     dest.write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"{args.label}: acionou {tp}/{len(SHOULD)} quando devia, {fp}/{len(SHOULD_NOT)} quando não devia")
-    for r in results:
+    print(f"{args.label}: acionou {tp}/{len(pos)} quando devia, {fp}/{len(neg)} quando não devia")
+    for r in ok:
         if r["fired"] != r["expected"]:
             print("  ERRO", "deveria" if r["expected"] else "não deveria", "|", r["query"][:90])
+    if errors:
+        print(f"  {len(errors)} execução(ões) falharam e ficaram fora da conta; rode de novo:", file=sys.stderr)
+        for r in errors:
+            print("  FALHA", r["error"], "|", r["query"][:90], file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

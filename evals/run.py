@@ -4,7 +4,8 @@ Arms:
   baseline   the user's request alone, no skill
   minimal    the request plus a two-line instruction a user could write themselves
   skill      the request, with the skill loaded as a plugin (it must trigger by itself)
-  novocab    as skill, but with the vocabulary list of §4 removed (ablation)
+  novocab    as skill, but with the **Vocabulary.** block of §4 removed (ablation); only
+             for versions that still have that block, such as v2.0 (--skill-dir)
   cand       a candidate version of the skill (--cand-dir), to compare with the current one
 
 Every arm gets the exact same user message. The plugin is exported to a folder outside
@@ -12,7 +13,7 @@ the repository, so a run cannot read the corpus, the judge prompts or the result
 
 Usage:
   python evals/run.py --out <folder outside the repo> --split dev|holdout|all
-      [--arms baseline,minimal,skill,novocab] [--reps 1] [--model sonnet] [--jobs 4]
+      [--arms baseline,minimal,skill] [--reps 1] [--model sonnet] [--jobs 4]
       [--skill-dir <released skill folder>] [--cand-dir skills/humanizer-pt-br]
 
 Results: <out>/runs/<arm>/<case>__r<rep>.json (resumable: finished runs are skipped).

@@ -1,8 +1,10 @@
 """Gera dist/<skill>.zip para upload no claude.ai.
 
 O ZIP contém a pasta da skill no topo (<skill>/SKILL.md), com separadores "/" e fim de
-linha LF em qualquer sistema operacional, para que o pacote gerado no Windows seja igual
-ao gerado no Linux.
+linha LF em qualquer sistema operacional. Cada entrada leva data fixa (1980-01-01) e
+permissões fixas: a mesma máquina gera sempre o mesmo arquivo, byte a byte, e no Windows
+e no Linux o conteúdo e os metadados são os mesmos. (Os bytes comprimidos dependem da
+zlib de cada Python e podem variar entre instalações.)
 
 Uso: python scripts/build_zip.py [--out dist]
 Autor: Alex Camacho Castilho
@@ -13,6 +15,7 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEXT = {".md", ".txt", ".json", ".py", ".yml", ".yaml"}
+FIXED_DATE = (1980, 1, 1, 0, 0, 0)  # the earliest date a ZIP entry can hold
 
 
 def main():
@@ -33,7 +36,11 @@ def main():
             data = path.read_bytes()
             if path.suffix.lower() in TEXT:
                 data = data.replace(b"\r\n", b"\n")
-            zf.writestr(arc, data)
+            info = zipfile.ZipInfo(arc, date_time=FIXED_DATE)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3  # Unix, so the attributes below mean the same everywhere
+            info.external_attr = 0o100644 << 16  # regular file, rw-r--r--
+            zf.writestr(info, data)
     print(out)
 
 

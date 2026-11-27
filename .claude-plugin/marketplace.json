@@ -10,7 +10,7 @@
       "name": "humanizer-pt-br",
       "source": "./",
       "description": "Humaniza textos em Português do Brasil: remove marcas de escrita de IA e reescreve com voz natural, sem alterar o conteúdo.",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "category": "productivity",
       "author": {
         "name": "Alex Camacho Castilho",
